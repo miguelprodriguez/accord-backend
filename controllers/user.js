@@ -1,6 +1,7 @@
 const UserValidator = require('../validators/user')
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
+const bcrypt = require('bcrypt')
 
 module.exports.login = (req, res) => {
     const { error } = UserValidator.loginSchema.validate(req, {
@@ -15,19 +16,18 @@ module.exports.login = (req, res) => {
 }
 
 module.exports.signup = async (req, res) => {
-    const { error } = UserValidator.signupSchema.validate(req.body, {
-        abortEarly: false,
-    });
+    const { error } = UserValidator.signupSchema.validate(req.body, { abortEarly: false });
     if (error) return res.status(400).send(error.details[0]);
 
     const isUsernameAlreadyExists = await prisma.user.findFirst() !== null
     if (isUsernameAlreadyExists) return res.status(409).send("Username already exists.")
 
+    const saltRounds = 10
     await prisma.user.create({
         data: {
             username: req.body.username,
             email: req.body.email,
-            password: req.body.password
+            password: await bcrypt.hash(req.body.password, saltRounds)
         }
     })
 
