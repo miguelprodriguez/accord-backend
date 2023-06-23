@@ -19,17 +19,28 @@ module.exports.signup = async (req, res) => {
     const { error } = UserValidator.signupSchema.validate(req.body, { abortEarly: false });
     if (error) return res.status(400).send(error.details[0]);
 
-    const isUsernameAlreadyExists = await prisma.user.findFirst() !== null
+    const isUsernameAlreadyExists = checkIfUsernameExistsAlready(req.body)
     if (isUsernameAlreadyExists) return res.status(409).send("Username already exists.")
 
-    const saltRounds = 10
+    const isEmailAlreadyExists = checkIfEmailExistsAlready(req.body)
+    if (isEmailAlreadyExists) return res.status(409).send("Email already exists, please login to your account.")
+
+    const SALT_ROUNDS = 10
     await prisma.user.create({
         data: {
             username: req.body.username,
             email: req.body.email,
-            password: await bcrypt.hash(req.body.password, saltRounds)
+            password: await bcrypt.hash(req.body.password, SALT_ROUNDS)
         }
     })
 
     return res.status(200).send("Signed up successfully");
+}
+
+const checkIfUsernameExistsAlready = async (requestBody) => {
+    return await prisma.user.findFirst({ where: { username: requestBody.username } }) !== null
+}
+
+const checkIfEmailExistsAlready = async (requestBody) => {
+    return await prisma.user.findFirst({ where: { username: requestBody.email } }) !== null
 }
