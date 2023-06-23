@@ -13,7 +13,7 @@ module.exports.login = async (req, res) => {
     const isPasswordMatching = bcrypt.compareSync(req.body.password, user.password)
     if (!isPasswordMatching) return res.status(403).send('Incorrect email or password')
 
-    return res.send("Logged in successfully");
+    return res.status(200).send("Logged in successfully");
 }
 
 module.exports.signup = async (req, res) => {
