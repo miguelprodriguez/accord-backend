@@ -1,12 +1,8 @@
-const UserValidator = require('../validators/user')
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const bcrypt = require('bcrypt')
 
 module.exports.login = async (req, res) => {
-    const { error } = UserValidator.loginSchema.validate(req.body, { abortEarly: false });
-    if (error) return res.status(400).send(error.details[0]);
-
     const user = await prisma.user.findFirst({ where: { email: req.body.email } })
     if (!user) return res.status(403).send('Incorrect email or password')
 
@@ -17,9 +13,6 @@ module.exports.login = async (req, res) => {
 }
 
 module.exports.signup = async (req, res) => {
-    const { error } = UserValidator.signupSchema.validate(req.body, { abortEarly: false });
-    if (error) return res.status(400).send(error.details[0]);
-
     const isUsernameAlreadyExists = await checkIfUsernameExistsAlready(req.body)
     if (isUsernameAlreadyExists) return res.status(409).send("Username already exists.")
 
