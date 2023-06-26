@@ -23,6 +23,7 @@ app.use(cors({
     credentials: true
 }))
 
+// Routes
 app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
