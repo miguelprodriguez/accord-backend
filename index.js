@@ -17,7 +17,6 @@ const io = new Server(server, {
 // Parse req body; middleware functions
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(helmet())
 app.use(cors({
     origin: 'http://localhost:3000', 
@@ -25,8 +24,6 @@ app.use(cors({
 }))
 
 app.use('/api/users', userRoutes);
-
-app.use(express.json())
 
 app.get('/', (req, res) => {
     res.json("hi")
