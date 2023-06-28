@@ -4,10 +4,10 @@ const bcrypt = require('bcrypt')
 
 module.exports.login = async (req, res) => {
     const existingUser = await prisma.user.findFirst({ where: { email: req.body.email } })
-    if (!existingUser) return res.status(403).send('Incorrect email or password')
+    if (!existingUser) return res.status(403).send({ message: 'Incorrect email or password' })
 
     const isPasswordMatching = bcrypt.compareSync(req.body.password, existingUser.password)
-    if (!isPasswordMatching) return res.status(403).send('Incorrect email or password')
+    if (!isPasswordMatching) return res.status(403).send({ message: 'Incorrect email or password' })
 
     const userId = await getUserId(req.body)
     const sessionData = {
@@ -21,10 +21,10 @@ module.exports.login = async (req, res) => {
 
 module.exports.signup = async (req, res) => {
     const isUsernameAlreadyExists = await checkIfUsernameExistsAlready(req.body)
-    if (isUsernameAlreadyExists) return res.status(409).send("Username already exists.")
+    if (isUsernameAlreadyExists) return res.status(409).send({ message: "Username already exists." })
 
     const isEmailAlreadyExists = await checkIfEmailExistsAlready(req.body)
-    if (isEmailAlreadyExists) return res.status(409).send("Email already exists, please login to your account.")
+    if (isEmailAlreadyExists) return res.status(409).json({ message: "Email already exists." })
 
     const SALT_ROUNDS = 10
     const HASHED_DATA = {
@@ -43,7 +43,7 @@ module.exports.signup = async (req, res) => {
     }
     req.session.user = sessionData
 
-    return res.send(req.session.user);
+    return res.status(200).send({ message: "User has been created successfully." });
 }
 
 const checkIfUsernameExistsAlready = async (requestBody) => {
@@ -59,6 +59,6 @@ const getUserId = async (requestBody) => {
         where: { email: requestBody.email },
         select: { id: true }
     })
-    
+
     return result.id
 }
