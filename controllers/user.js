@@ -19,7 +19,7 @@ module.exports.login = async (req, res) => {
 
         return res.status(200).send({ message: "Logged in successfully" })
     } catch (error) {
-        return res.status(500).send({ message: error.message })
+        return res.status(500).send({ message: 'We are having a few problems. Please try again later.' })
     }
 }
 
@@ -50,7 +50,7 @@ module.exports.signup = async (req, res) => {
 
         return res.status(200).send({ message: "User has been created successfully." });
     } catch (error) {
-        return res.status(500).send({ message: error.message })
+        return res.status(500).send({ message: 'We are having a few problems. Please try again later.' })
     }
 }
 
