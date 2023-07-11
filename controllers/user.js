@@ -17,9 +17,9 @@ module.exports.login = async (req, res) => {
         }
         req.session.user = sessionData
 
-        return res.status(200).send({ message: "Logged in successfully" })
+        return res.status(200).send({ isLoggedIn: true, message: "Logged in successfully" })
     } catch (error) {
-        return res.status(500).send({ message: 'We are having a few problems. Please try again later.' })
+        return res.status(500).send({ isLoggedIn: false, message: 'We are having a few problems. Please try again later.' })
     }
 }
 
@@ -48,9 +48,9 @@ module.exports.signup = async (req, res) => {
         }
         req.session.user = sessionData
 
-        return res.status(200).send({ message: "User has been created successfully." });
+        return res.status(200).send({ isLoggedIn: true, message: "User has been created successfully." });
     } catch (error) {
-        return res.status(500).send({ message: 'We are having a few problems. Please try again later.' })
+        return res.status(500).send({ isLoggedIn: false, message: 'We are having a few problems. Please try again later.' })
     }
 }
 
