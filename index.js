@@ -7,6 +7,8 @@ const helmet = require('helmet')
 const cors = require('cors')
 const userRoutes = require('./routes/user')
 const session = require('express-session')
+// const Redis = require('ioredis')
+// const RedisStore = require('connect-redis').default
 require('dotenv').config()
 
 const corsConfig = {
@@ -15,6 +17,9 @@ const corsConfig = {
 }
 
 const io = new Server(server, { cors: corsConfig })
+
+// const redisClient = new Redis()
+// const redisStore = new RedisStore({ client: redisClient })
 
 // Middleware functions
 app.use(express.json());
@@ -28,8 +33,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false,
+        secure: process.env.ENVIRONMENT === 'production',
+        sameSite: process.env.ENVIRONMENT === 'production',
+        httpOnly: true
     },
+    // store: redisStore
 }))
 
 // Routes
