@@ -2,6 +2,11 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const bcrypt = require('bcrypt')
 
+module.exports.checkIfLoggedIn = async (req, res) => {
+    if (!req.session.user) return res.status(403).send({ message: 'Please login.' })
+    res.status(200).send({ message: req.session.user })
+}
+
 module.exports.login = async (req, res) => {
     try {
         const existingUser = await prisma.user.findFirst({ where: { email: req.body.email } })
@@ -17,9 +22,9 @@ module.exports.login = async (req, res) => {
         }
         req.session.user = sessionData
 
-        return res.status(200).send({ isLoggedIn: true, message: "Logged in successfully" })
+        return res.status(200).send({ message: "Logged in successfully" })
     } catch (error) {
-        return res.status(500).send({ isLoggedIn: false, message: 'We are having a few problems. Please try again later.' })
+        return res.status(500).send({ message: 'We are having a few problems. Please try again later.' })
     }
 }
 
