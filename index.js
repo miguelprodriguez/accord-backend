@@ -37,6 +37,7 @@ app.use(session({
         sameSite: process.env.ENVIRONMENT === 'production',
         httpOnly: true
     },
+    expires: 1000 * 60 * 60 * 24 * 7
     // store: redisStore
 }))
 
