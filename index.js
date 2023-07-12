@@ -35,9 +35,9 @@ app.use(session({
     cookie: {
         secure: process.env.ENVIRONMENT === 'production',
         sameSite: process.env.ENVIRONMENT === 'production',
-        httpOnly: true
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
-    expires: 1000 * 60 * 60 * 24 * 7,
     store: redisStore
 }))
 
