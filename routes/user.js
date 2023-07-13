@@ -3,12 +3,12 @@ const router = express.Router()
 const userController = require('../controllers/user')
 const validateForm = require('../middlewares/validateForm')
 const userValidator = require('../validators/user')
-const { limitRate } = require('../middlewares/limitRate')
+const { checkRateLimit } = require('../middlewares/checkRateLimit')
 
 router.route('/login')
     .get(userController.checkIfLoggedIn)
     .post(
-        limitRate,
+        checkRateLimit,
         validateForm(userValidator.loginSchema),
         userController.login
     )

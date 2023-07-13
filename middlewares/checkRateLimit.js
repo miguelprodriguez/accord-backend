@@ -11,7 +11,7 @@ const opts = {
 
 const rateLimiterRedis = new RateLimiterRedis(opts);
 
-module.exports.limitRate = (req, res, next) => {
+module.exports.checkRateLimit = (req, res, next) => {
     // Rate limiting only applies to the /tokens route.
     rateLimiterRedis
         .consume(req.connection.remoteAddress, 2) // consume 2 points
