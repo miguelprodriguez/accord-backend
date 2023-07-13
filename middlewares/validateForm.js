@@ -1,4 +1,4 @@
-const validateSchema = schema => (req, res, next) => {
+const validateForm = schema => (req, res, next) => {
     if (!schema) return res.status(500)
 
     const { error } = schema.validate(req.body, { abortEarly: false });
@@ -7,4 +7,4 @@ const validateSchema = schema => (req, res, next) => {
     return next()
 }
 
-module.exports = validateSchema
+module.exports = validateForm

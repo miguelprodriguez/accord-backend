@@ -1,18 +1,18 @@
 const express = require('express')
 const router = express.Router()
-const UserController = require('../controllers/user')
-const validateSchema = require('../middlewares/user')
-const UserValidator = require('../validators/user')
-const { limitRate } = require('../controllers/rateLimit')
+const userController = require('../controllers/user')
+const validateForm = require('../middlewares/validateForm')
+const userValidator = require('../validators/user')
+const { limitRate } = require('../middlewares/limitRate')
 
 router.route('/login')
-    .get(UserController.checkIfLoggedIn)
+    .get(userController.checkIfLoggedIn)
     .post(
         limitRate,
-        validateSchema(UserValidator.loginSchema),
-        UserController.login
+        validateForm(userValidator.loginSchema),
+        userController.login
     )
 
-router.post('/signup', validateSchema(UserValidator.signupSchema), UserController.signup)
+router.post('/signup', validateForm(userValidator.signupSchema), userController.signup)
 
-module.exports = router 
+module.exports = router

@@ -1,6 +1,16 @@
 const { RateLimiterRedis } = require('rate-limiter-flexible');
 const Redis = require('ioredis')
 
+const redisClient = new Redis()
+const opts = {
+    // Basic options
+    storeClient: redisClient,
+    points: 6, // Number of points
+    duration: 5, // Per second(s)
+};
+
+const rateLimiterRedis = new RateLimiterRedis(opts);
+
 module.exports.limitRate = (req, res, next) => {
     // Rate limiting only applies to the /tokens route.
     rateLimiterRedis
@@ -14,13 +24,3 @@ module.exports.limitRate = (req, res, next) => {
             res.status(429).send('Too Many Requests')
         })
 }
-
-const redisClient = new Redis()
-const opts = {
-    // Basic options
-    storeClient: redisClient,
-    points: 6, // Number of points
-    duration: 5, // Per second(s)
-};
-
-const rateLimiterRedis = new RateLimiterRedis(opts);
