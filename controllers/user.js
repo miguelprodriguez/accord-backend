@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const bcrypt = require('bcrypt')
+const { v4: uuidv4 } = require('uuid');
 
 module.exports.checkIfLoggedIn = async (req, res) => {
     if (!req.session.user) return res.status(403).send({ message: 'Please login.' })
@@ -16,9 +17,10 @@ module.exports.login = async (req, res) => {
         if (!isPasswordMatching) return res.status(403).send({ message: 'Incorrect email or password' })
 
         const userId = await getUserId(req.body)
+
         const sessionData = {
             email: req.body.email,
-            id: userId
+            userId: userId
         }
         req.session.user = sessionData
 
@@ -37,14 +39,14 @@ module.exports.signup = async (req, res) => {
         if (isEmailAlreadyExists) return res.status(409).json({ message: "Email already exists." })
 
         const SALT_ROUNDS = 10
-        const HASHED_DATA = {
+        await prisma.user.create({
             data: {
                 username: req.body.username,
                 email: req.body.email,
-                password: bcrypt.hashSync(req.body.password, SALT_ROUNDS)
+                password: bcrypt.hashSync(req.body.password, SALT_ROUNDS),
+                userId: uuidv4()
             }
-        }
-        await prisma.user.create(HASHED_DATA)
+        })
 
         const userId = await getUserId(req.body)
         const sessionData = {
@@ -53,9 +55,9 @@ module.exports.signup = async (req, res) => {
         }
         req.session.user = sessionData
 
-        return res.status(200).send({ isLoggedIn: true, message: "User has been created successfully." });
+        return res.status(200).send({ message: "User has been created successfully." });
     } catch (error) {
-        return res.status(500).send({ isLoggedIn: false, message: 'We are having a few problems. Please try again later.' })
+        return res.status(500).send({ message: 'We are having a few problems. Please try again later.' })
     }
 }
 
@@ -70,8 +72,7 @@ const checkIfEmailExistsAlready = async (requestBody) => {
 const getUserId = async (requestBody) => {
     const result = await prisma.user.findFirst({
         where: { email: requestBody.email },
-        select: { id: true }
     })
 
-    return result.id
+    return result.userId
 }

@@ -21,7 +21,8 @@
     "ioredis": "^5.3.2",
     "joi": "^17.9.2",
     "rate-limiter-flexible": "^2.4.1",
-    "socket.io": "^4.6.2"
+    "socket.io": "^4.6.2",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "prisma": "^4.16.0"
