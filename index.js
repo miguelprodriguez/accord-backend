@@ -18,7 +18,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet())
 app.use(cors(corsConfig))
-
 app.use(sessionMiddleware)
 
 // Routes
