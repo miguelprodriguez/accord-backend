@@ -16,11 +16,11 @@ module.exports.login = async (req, res) => {
         const isPasswordMatching = bcrypt.compareSync(req.body.password, existingUser.password)
         if (!isPasswordMatching) return res.status(403).send({ message: 'Incorrect email or password' })
 
-        const userId = await getUserId(req.body)
+        const userDetails = await getUserDetails(req.body)
 
         const sessionData = {
-            email: req.body.email,
-            userId: userId
+            username: userDetails.username,
+            userId: userDetails.userId
         }
         req.session.user = sessionData
 
@@ -48,10 +48,10 @@ module.exports.signup = async (req, res) => {
             }
         })
 
-        const userId = await getUserId(req.body)
+        const userDetails = await getUserDetails(req.body)
         const sessionData = {
-            email: req.body.email,
-            userId
+            username: userDetails.username,
+            userId: userDetails.userId
         }
         req.session.user = sessionData
 
@@ -69,10 +69,10 @@ const checkIfEmailExistsAlready = async (requestBody) => {
     return await prisma.user.findFirst({ where: { email: requestBody.email } }) !== null
 }
 
-const getUserId = async (requestBody) => {
-    const result = await prisma.user.findFirst({
+const getUserDetails = async (requestBody) => {
+    const details = await prisma.user.findFirst({
         where: { email: requestBody.email },
     })
 
-    return result.userId
+    return details
 }

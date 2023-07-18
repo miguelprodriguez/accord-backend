@@ -39,14 +39,14 @@ io.use((socket, next) => {
         return
     }
 
-    // Create user property and desctruce from socket request
+    // Create user property and desctructure from socket request
     socket.user = { ...socket.request.session.user }
     next()
 })
 io.on('connection', socket => {
     console.log("Socket username: ", socket.user)
     // HSET key field value [field value ...]
-    redisClient.hset(`userId: ${socket.user.username}`, "userId", "socket.user.userId")
+    redisClient.hset(`userId:${socket.user.username}`, "userId", socket.user.userId)
 })
 
 server.listen(4000, () => console.log('Server listening on port 4000'))
