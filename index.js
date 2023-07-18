@@ -31,8 +31,13 @@ app.get('/', (req, res) => {
 const io = new Server(server, { cors: corsConfig })
 
 io.use(wrap(sessionMiddleware))
+io.use((socket, next) => {
+    if (!socket.request.session || !socket.request.session.user) {
+        next(new Error("You shall not pass"))
+    }
+    else next()
+})
 io.on('connection', socket => {
-    console.log("Socket IO: ", socket.id)
     console.log("Socket request: ", socket.request.session)
 })
 
