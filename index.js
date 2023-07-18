@@ -45,8 +45,35 @@ io.use((socket, next) => {
 })
 io.on('connection', socket => {
     console.log("Socket username: ", socket.user)
-    // HSET key field value [field value ...]
+    // HSET key field/column value [field value ...]
     redisClient.hset(`userId:${socket.user.username}`, "userId", socket.user.userId)
+
+    socket.on('add_friend', async (friendName, callback) => {
+        if (friendName === socket.user.username) return callback({
+            done: false,
+            errorMessage: 'You cannot add yourself.'
+        })
+
+        const currentFriendsList = await redisClient.lrange(
+            `friends:${socket.user.username}`,
+            0, -1 // get the whole range
+        )
+        if (currentFriendsList && currentFriendsList.indexOf(friendName) !== -1) {
+            return callback({ done: false, errorMessage: 'Friend already added.' })
+        }
+
+        const friendUserid = await redisClient.hget(
+            `userId:${friendName}`,
+            'userId'
+        )
+        if (!friendUserid) return callback({
+            done: false,
+            errorMessage: "User does not exist."
+        })
+
+        await redisClient.lpush(`friends:${socket.user.username}`, friendName)
+        callback({ done: true })
+    })
 })
 
 server.listen(4000, () => console.log('Server listening on port 4000'))
