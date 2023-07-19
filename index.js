@@ -6,6 +6,7 @@ const server = http.createServer(app)
 const helmet = require('helmet')
 const cors = require('cors')
 const userRoutes = require('./routes/user')
+const chatRoutes = require('./routes/chat')
 const { sessionMiddleware, wrap } = require('./middlewares/session')
 const Redis = require('ioredis')
 
@@ -23,13 +24,10 @@ app.use(sessionMiddleware)
 
 // Routes
 app.use('/api/users', userRoutes);
-app.get('/', (req, res) => {
-    res.json("hi")
-})
+app.use('/api/chats', chatRoutes);
 
 // IO 
 const io = new Server(server, { cors: corsConfig })
-
 io.use(wrap(sessionMiddleware))
 
 const redisClient = new Redis()

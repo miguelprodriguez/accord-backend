@@ -6,7 +6,7 @@ const userValidator = require('../validators/user')
 const { checkRateLimit } = require('../middlewares/checkRateLimit')
 
 router.route('/login')
-    .get(userController.checkIfLoggedIn)
+    .get(userController.currentUser)
     .post(
         checkRateLimit,
         validateForm(userValidator.loginSchema),
@@ -14,6 +14,6 @@ router.route('/login')
     )
 
 router.post('/signup', validateForm(userValidator.signupSchema), userController.signup)
-router.get('/', userController.getSuggestedUsers)
+router.get('/', userController.suggestedUsers)
 
 module.exports = router

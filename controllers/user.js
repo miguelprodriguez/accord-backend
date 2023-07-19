@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const bcrypt = require('bcrypt')
 
-module.exports.checkIfLoggedIn = async (req, res) => {
+module.exports.currentUser = async (req, res) => {
     if (!req.session.user) return res.status(403).send({ message: 'Please login.' })
     res.status(200).send({ message: req.session.user })
 }
@@ -60,7 +60,7 @@ module.exports.signup = async (req, res) => {
     }
 }
 
-module.exports.getSuggestedUsers = async (req, res) => {
+module.exports.suggestedUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany()
         const suggestedUsers = users.filter(user => {
