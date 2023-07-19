@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const bcrypt = require('bcrypt')
+const { v4: uuidv4 } = require('uuid');
 
 module.exports.currentUser = async (req, res) => {
     if (!req.session.user) return res.status(403).send({ message: 'Please login.' })
@@ -41,6 +42,7 @@ module.exports.signup = async (req, res) => {
         await prisma.user.create({
             data: {
                 username: req.body.username,
+                userId: uuidv4(),
                 email: req.body.email,
                 password: bcrypt.hashSync(req.body.password, SALT_ROUNDS),
                 image: process.env.DEFAULT_USER_IMAGE_URL
