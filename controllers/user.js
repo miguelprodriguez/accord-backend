@@ -60,10 +60,13 @@ module.exports.signup = async (req, res) => {
     }
 }
 
-module.exports.getAllUsers = async (req, res) => {
+module.exports.getSuggestedUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany()
-        const userDetailsWithoutPassword = users.map(user => {
+        const suggestedUsers = users.filter(user => {
+            return user.username.includes(req.query.username)
+        })
+        const userDetailsWithoutPassword = suggestedUsers.map(user => {
             delete user.password
             return user
         })

@@ -14,6 +14,6 @@ router.route('/login')
     )
 
 router.post('/signup', validateForm(userValidator.signupSchema), userController.signup)
-router.get('/', userController.getAllUsers)
+router.get('/', userController.getSuggestedUsers)
 
 module.exports = router
