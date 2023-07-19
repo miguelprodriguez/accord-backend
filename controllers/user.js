@@ -60,6 +60,19 @@ module.exports.signup = async (req, res) => {
     }
 }
 
+module.exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await prisma.user.findMany()
+        const userDetailsWithoutPassword = users.map(user => {
+            delete user.password
+            return user
+        })
+        return res.status(200).send(userDetailsWithoutPassword)
+    } catch (error) {
+        return res.status(500).send({ message: 'Something went wrong. Please try again later.' })
+    }
+}
+
 const checkIfUsernameExistsAlready = async (requestBody) => {
     return await prisma.user.findFirst({ where: { username: requestBody.username } }) !== null
 }
