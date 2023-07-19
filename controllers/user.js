@@ -63,7 +63,6 @@ module.exports.signup = async (req, res) => {
 }
 
 module.exports.suggestedUsers = async (req, res) => {
-
     try {
         const users = await prisma.user.findMany()
         const suggestedUsers = users.filter(user => {

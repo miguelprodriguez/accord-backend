@@ -30,7 +30,7 @@ app.use('/api/chats', chatRoutes);
 const io = new Server(server, { cors: corsConfig })
 io.use(wrap(sessionMiddleware))
 
-const redisClient = new Redis()
+// const redisClient = new Redis()
 io.use((socket, next) => {
     if (!socket.request.session || !socket.request.session.user) {
         next(new Error("You shall not pass"))
@@ -42,36 +42,36 @@ io.use((socket, next) => {
     next()
 })
 io.on('connection', socket => {
-    console.log("Socket username: ", socket.user)
-    // HSET key field/column value [field value ...]
-    redisClient.hset(`userId:${socket.user.username}`, "userId", socket.user.userId)
+    // console.log("Socket username: ", socket.user)
+    // // HSET key field/column value [field value ...]
+    // redisClient.hset(`userId:${socket.user.username}`, "userId", socket.user.userId)
 
-    socket.on('add_friend', async (friendName, callback) => {
-        if (friendName === socket.user.username) return callback({
-            done: false,
-            errorMessage: 'You cannot add yourself.'
-        })
+    // socket.on('add_friend', async (friendName, callback) => {
+    //     if (friendName === socket.user.username) return callback({
+    //         done: false,
+    //         errorMessage: 'You cannot add yourself.'
+    //     })
 
-        const currentFriendsList = await redisClient.lrange(
-            `friends:${socket.user.username}`,
-            0, -1 // get the whole range
-        )
-        if (currentFriendsList && currentFriendsList.indexOf(friendName) !== -1) {
-            return callback({ done: false, errorMessage: 'Friend already added.' })
-        }
+    //     const currentFriendsList = await redisClient.lrange(
+    //         `friends:${socket.user.username}`,
+    //         0, -1 // get the whole range
+    //     )
+    //     if (currentFriendsList && currentFriendsList.indexOf(friendName) !== -1) {
+    //         return callback({ done: false, errorMessage: 'Friend already added.' })
+    //     }
 
-        const friendUserid = await redisClient.hget(
-            `userId:${friendName}`,
-            'userId'
-        )
-        if (!friendUserid) return callback({
-            done: false,
-            errorMessage: "User does not exist."
-        })
+    //     const friendUserid = await redisClient.hget(
+    //         `userId:${friendName}`,
+    //         'userId'
+    //     )
+    //     if (!friendUserid) return callback({
+    //         done: false,
+    //         errorMessage: "User does not exist."
+    //     })
 
-        await redisClient.lpush(`friends:${socket.user.username}`, friendName)
-        callback({ done: true })
-    })
+    //     await redisClient.lpush(`friends:${socket.user.username}`, friendName)
+    //     callback({ done: true })
+    // })
 })
 
 server.listen(4000, () => console.log('Server listening on port 4000'))
