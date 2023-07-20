@@ -32,9 +32,6 @@ async function getLastMessage(chatId) {
 module.exports.findOrCreateChat = async (req, res) => {
     const { senderId, recipientId } = req.body
 
-    console.log("Sender ID: ", senderId)
-    console.log("Recipient ID: ", recipientId)
-
     try {
         if (!senderId) return res.status(400).send("No sender id received.")
         if (!recipientId) return res.status(400).send("No recipient id received.")
