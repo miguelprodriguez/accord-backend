@@ -18,7 +18,6 @@ module.exports.allChats = async (req, res) => {
     }
 }
 
-
 async function getLastMessage(chatId) {
     const messages = await prisma.message.findMany({
         where: { chatId },
@@ -31,8 +30,6 @@ async function getLastMessage(chatId) {
 }
 
 module.exports.findOrCreateChat = async (req, res) => {
-    // const senderId = "521d4a7e-294c-4036-8ba6-483de7b0b4e2";
-    // const recipientId = "15570a37-ab94-4c9c-bc86-325aebcb157e"
     const { senderId, recipientId } = req.body
 
     try {
@@ -49,7 +46,7 @@ module.exports.findOrCreateChat = async (req, res) => {
 
         const newChat = await prisma.chat.create({
             data: {
-                participants: { connect: [{ id: senderId }, { id: recipientId }] },
+                participants: { connect: [{ userId: senderId }, { userId: recipientId }] },
             },
             include: { participants: true },
         });
