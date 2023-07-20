@@ -4,6 +4,6 @@ const chatController = require('../controllers/chat')
 
 router.route('/')
     .get(chatController.allChats)
-// .post()
+    .post(chatController.findOrCreateChat)
 
 module.exports = router
