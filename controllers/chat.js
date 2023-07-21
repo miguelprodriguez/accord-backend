@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client")
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient()
 
 module.exports.allChats = async (req, res) => {
@@ -18,17 +18,6 @@ module.exports.allChats = async (req, res) => {
     }
 }
 
-async function getLastMessage(chatId) {
-    const messages = await prisma.message.findMany({
-        where: { chatId },
-        orderBy: { createdAt: 'desc' }, // Order messages by createdAt in descending order
-        take: 1, // Get only the first (most recent) message
-        include: { sender: true }, // Include the sender details in the message object
-    });
-
-    return messages[0]; // Return the last message or null if there are no messages
-}
-
 module.exports.findOrCreateChat = async (req, res) => {
     const { senderId, recipientId } = req.body
 
@@ -45,16 +34,36 @@ module.exports.findOrCreateChat = async (req, res) => {
             },
             include: { participants: true },
         });
-        if (existingChat) return res.status(200).send(existingChat)
+        if (existingChat) return res.status(200).send({ isExisting: true, ...existingChat })
 
-        const newChat = await prisma.chat.create({
+        await prisma.chat.create({
             data: {
                 participants: { connect: [{ userId: senderId }, { userId: recipientId }] },
             },
             include: { participants: true },
         });
-        return res.status(200).send(newChat);
+
+        const allUserChats = await prisma.chat.findMany({
+            where: { participants: { some: { userId: senderId } } },
+            include: { participants: true }
+        })
+        for (const chat of allUserChats) {
+            chat.lastMessage = await getLastMessage(chat.id);
+        }
+
+        return res.status(200).send({ isExisting: false, allUserChats });
     } catch (error) {
         return res.status(500).send("Something went wrong. Please try again later.")
     }
+}
+
+async function getLastMessage(chatId) {
+    const messages = await prisma.message.findMany({
+        where: { chatId },
+        orderBy: { createdAt: 'desc' }, // Order messages by createdAt in descending order
+        take: 1, // Get only the first (most recent) message
+        include: { sender: true }, // Include the sender details in the message object
+    });
+
+    return messages[0] || null; // Return the last message or null if there are no messages
 }
