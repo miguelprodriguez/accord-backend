@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports.currentUser = async (req, res) => {
     if (!req.session.user) return res.status(403).send({ message: 'Please login.' })
+
     const user = await prisma.user.findFirst({ where: { username: req.session.user.username } })
     res.status(200).send(user)
 }
