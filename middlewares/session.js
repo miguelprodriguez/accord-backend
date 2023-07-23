@@ -1,11 +1,7 @@
 
 const session = require('express-session')
-const Redis = require('ioredis')
-const RedisStore = require('connect-redis').default
 require('dotenv').config()
-
-const redisClient = new Redis()
-const redisStore = new RedisStore({ client: redisClient })
+const { redisStore } = require('../redis')
 
 const sessionMiddleware = session({
     name: 'sid', // session ID

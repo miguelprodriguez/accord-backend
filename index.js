@@ -8,7 +8,7 @@ const cors = require('cors')
 const userRoutes = require('./routes/user')
 const chatRoutes = require('./routes/chat')
 const { sessionMiddleware, wrap } = require('./middlewares/session')
-const Redis = require('ioredis')
+const { handleOnlineStatus, authenticateSocket } = require('./middlewares/socket')
 
 const corsConfig = {
     origin: 'http://localhost:3000',
@@ -31,47 +31,9 @@ const io = new Server(server, { cors: corsConfig })
 io.use(wrap(sessionMiddleware))
 
 // const redisClient = new Redis()
-io.use((socket, next) => {
-    if (!socket.request.session || !socket.request.session.user) {
-        next(new Error("You shall not pass"))
-        return
-    }
+io.use(authenticateSocket)
 
-    // Create user property and desctructure from socket request
-    socket.user = { ...socket.request.session.user }
-    next()
-})
-io.on('connection', socket => {
-    // console.log("Socket username: ", socket.user)
-    // // HSET key field/column value [field value ...]
-    // redisClient.hset(`userId:${socket.user.username}`, "userId", socket.user.userId)
-
-    // socket.on('add_friend', async (friendName, callback) => {
-    //     if (friendName === socket.user.username) return callback({
-    //         done: false,
-    //         errorMessage: 'You cannot add yourself.'
-    //     })
-
-    //     const currentFriendsList = await redisClient.lrange(
-    //         `friends:${socket.user.username}`,
-    //         0, -1 // get the whole range
-    //     )
-    //     if (currentFriendsList && currentFriendsList.indexOf(friendName) !== -1) {
-    //         return callback({ done: false, errorMessage: 'Friend already added.' })
-    //     }
-
-    //     const friendUserid = await redisClient.hget(
-    //         `userId:${friendName}`,
-    //         'userId'
-    //     )
-    //     if (!friendUserid) return callback({
-    //         done: false,
-    //         errorMessage: "User does not exist."
-    //     })
-
-    //     await redisClient.lpush(`friends:${socket.user.username}`, friendName)
-    //     callback({ done: true })
-    // })
-})
+const onlineUsers = [];
+io.on('connection', socket => handleOnlineStatus(socket, onlineUsers, io))
 
 server.listen(4000, () => console.log('Server listening on port 4000'))
